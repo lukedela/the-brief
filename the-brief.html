@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Brief. — Your Daily Edge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #1a1a18;
+  --ink-muted: #6b6b65;
+  --ink-faint: #aeaea5;
+  --paper: #faf8f3;
+  --paper-warm: #f3f0e8;
+  --paper-card: #ffffff;
+  --rule: #e0ddd4;
+  --accent-firm: #2d4a7a;
+  --accent-market: #1a5c3a;
+  --accent-political: #7a2d2d;
+  --gold: #c9a227;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ede9df;
+    --ink-muted: #a8a49a;
+    --ink-faint: #666259;
+    --paper: #18170f;
+    --paper-warm: #1e1c12;
+    --paper-card: #222018;
+    --rule: #2e2c22;
+    --accent-firm: #7ba7e0;
+    --accent-market: #5ab87a;
+    --accent-political: #e07a7a;
+    --gold: #d4ad45;
+  }
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── SETUP SCREEN ── */
+#setup-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.setup-card {
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+}
+
+.setup-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.setup-logo span { color: var(--gold); }
+
+.setup-tagline {
+  font-size: 13px;
+  color: var(--ink-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+}
+
+.setup-field {
+  text-align: left;
+  margin-bottom: 1.25rem;
+}
+
+.setup-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 6px;
+}
+
+.setup-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.setup-input:focus { border-color: var(--ink-muted); }
+
+.setup-note {
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+.setup-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: opacity 0.15s;
+}
+
+.setup-btn:hover { opacity: 0.85; }
+
+/* ── APP ── */
+#app { display: none; }
+
+.masthead {
+  border-bottom: 3px double var(--rule);
+  padding: 1.25rem 2rem 0.875rem;
+  text-align: center;
+  position: relative;
+}
+
+.masthead-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 0.4rem;
+}
+
+.masthead-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.masthead-title span { color: var(--gold); }
+
+.masthead-date {
+  font-size: 10px;
+  color: var(--ink-muted);
+  letter-spacing: 0.12em;
+  margin-top: 0.4rem;
+  text-transform: uppercase;
+}
+
+.streak-pill {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  background: var(--paper-warm);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 5px 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: default;
+  user-select: none;
+}
+
+.streak-count { color: var(--gold); font-weight: 700; }
+
+.completion-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.completion-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--rule);
+  transition: background 0.4s;
+}
+
+.dot-done-firm     { background: var(--accent-firm); }
+.dot-done-market   { background: var(--accent-market); }
+.dot-done-political{ background: var(--accent-political); }
+
+.completion-text {
+  font-size: 11px;
+  color: var(--ink-muted);
+  margin-left: 6px;
+  letter-spacing: 0.04em;
+}
+
+.nav-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--rule);
+  padding: 0 2rem;
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  overflow-x: auto;
+}
+
+.nav-tab {
+  padding: 0.8rem 1.25rem;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--ink-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-tab:hover { color: var(--ink); }
+.nav-tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+.nav-tab.active[data-section="firm"]      { color: var(--accent-firm);      border-bottom-color: var(--accent-firm); }
+.nav-tab.active[data-section="market"]    { color: var(--accent-market);    border-bottom-color: var(--accent-market); }
+.nav-tab.active[data-section="political"] { color: var(--accent-political); border-bottom-color: var(--accent-political); }
+
+.tab-done-indicator {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  margin-left: 6px;
+  vertical-align: middle;
+  background: transparent;
+}
+
+.content {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+}
+
+.article-section { display: none; }
+.article-section.active { display: block; }
+
+/* ── GENERATE BUTTON ── */
+.generate-btn {
+  display: block;
+  width: 100%;
+  padding: 1.25rem;
+  background: transparent;
+  border: 1px dashed var(--rule);
+  border-radius: 6px;
+  color: var(--ink-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.generate-btn:hover {
+  border-color: var(--ink-muted);
+  color: var(--ink);
+  background: var(--paper-warm);
+}
+
+/* ── LOADING ── */
+.loading-state {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--ink-muted);
+}
+
+.loading-label {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.loading-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 260px;
+  margin: 0 auto;
+}
+
+.loading-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--ink-faint);
+  opacity: 0.4;
+  transition: opacity 0.4s;
+  text-align: left;
+}
+
+.loading-step.active { opacity: 1; color: var(--ink-muted); }
+.loading-step.done   { opacity: 0.7; }
+
+.step-icon {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--rule);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.loading-step.active .step-icon {
+  border-color: var(--ink-muted);
+  animation: pulse-ring 1s ease-in-out infinite;
+}
+
+.loading-step.done .step-icon {
+  border-color: var(--accent-market);
+  color: var(--accent-market);
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* ── ARTICLE ── */
+.article-kicker {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+.kicker-firm      { color: var(--accent-firm); }
+.kicker-market    { color: var(--accent-market); }
+.kicker-political { color: var(--accent-political); }
+
+.article-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.75rem;
+}
+
+.article-deck {
+  font-size: 1.05rem;
+  color: var(--ink-muted);
+  font-weight: 300;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  border-left: 3px solid var(--rule);
+  padding-left: 1rem;
+  font-style: italic;
+}
+
+.article-rule {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 1.5rem 0;
+}
+
+.section-heading {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 1.5rem 0 0.875rem;
+}
+
+/* History */
+.history-timeline {
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--rule);
+  margin: 0.5rem 0 1rem;
+}
+
+.history-item { margin-bottom: 1rem; position: relative; }
+
+.history-item::before {
+  content: '';
+  position: absolute;
+  left: -1.625rem; top: 6px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--rule);
+  border: 2px solid var(--paper);
+}
+
+.history-year {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+
+.history-text { font-size: 0.875rem; line-height: 1.55; }
+
+/* Psychology callout */
+.psych-callout {
+  background: var(--paper-warm);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 4px 4px 0;
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.psych-callout-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+}
+
+/* Body */
+.article-body { font-size: 0.975rem; line-height: 1.85; }
+.article-body p { margin-bottom: 1rem; }
+
+/* Facts */
+.facts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.fact-card {
+  background: var(--paper-warm);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.875rem 1rem;
+}
+
+.fact-label {
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 4px;
+}
+
+.fact-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* Impact */
+.impact-block {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.impact-badge {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 2px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.badge-st { background: rgba(201,162,39,0.15); color: var(--gold); }
+.badge-lt { background: rgba(45,74,122,0.15); color: var(--accent-firm); }
+
+.impact-text { font-size: 0.9rem; line-height: 1.55; }
+
+/* Pros/Cons */
+.pros-cons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+  margin: 0.5rem 0;
+}
+
+.pros, .cons {
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.pros { background: rgba(26,92,58,0.06); border: 1px solid rgba(26,92,58,0.18); }
+.cons { background: rgba(122,45,45,0.06); border: 1px solid rgba(122,45,45,0.18); }
+
+.pros-cons-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.pros .pros-cons-label { color: var(--accent-market); }
+.cons .pros-cons-label { color: var(--accent-political); }
+
+.pros-cons ul { list-style: none; }
+.pros-cons li {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  padding: 3px 0 3px 1.25rem;
+  position: relative;
+}
+
+.pros li::before { content: '+'; position: absolute; left: 0; color: var(--accent-market); font-weight: 700; }
+.cons li::before { content: '−'; position: absolute; left: 0; color: var(--accent-political); font-weight: 700; }
+
+/* Questions */
+.questions-box {
+  background: var(--paper-warm);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 1.125rem 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.questions-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.875rem;
+}
+
+.question-item {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--rule);
+  font-style: italic;
+}
+
+.question-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+/* Reflection */
+.reflection-zone {
+  margin-top: 2rem;
+  border-top: 3px double var(--rule);
+  padding-top: 1.5rem;
+}
+
+.reflection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.35rem;
+}
+
+.reflection-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.word-count { font-size: 12px; color: var(--ink-faint); }
+
+.reflection-prompt {
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  margin-bottom: 0.875rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.reflection-textarea {
+  width: 100%;
+  min-height: 110px;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.875rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.65;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.reflection-textarea:focus { border-color: var(--ink-muted); }
+.reflection-textarea::placeholder { color: var(--ink-faint); font-style: italic; }
+
+.save-btn {
+  display: block;
+  margin-top: 0.75rem;
+  margin-left: auto;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 3px;
+  padding: 9px 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.save-btn:hover { opacity: 0.8; }
+.save-btn:disabled { opacity: 0.4; cursor: default; }
+.save-btn.saved { opacity: 0.5; }
+
+/* ── CELEBRATION MODAL ── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.overlay.show { display: flex; }
+
+.cel-card {
+  background: var(--paper-card);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  animation: pop 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes pop { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.cel-emoji { font-size: 2.75rem; margin-bottom: 0.875rem; }
+
+.cel-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.cel-sub {
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+.cel-streak {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+
+.cel-close {
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 3px;
+  padding: 10px 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* ── PAST ENTRIES PANEL ── */
+.history-panel-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 50;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.history-panel {
+  display: none;
+  position: fixed;
+  right: 0; top: 0; bottom: 0;
+  width: 380px;
+  background: var(--paper-card);
+  border-left: 1px solid var(--rule);
+  z-index: 100;
+  overflow-y: auto;
+  padding: 1.5rem;
+  box-shadow: -8px 0 32px rgba(0,0,0,0.1);
+}
+
+.history-panel.open { display: block; }
+
+.history-panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.history-panel-sub {
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin-bottom: 1.5rem;
+}
+
+.history-panel-close {
+  position: absolute;
+  top: 1.25rem; right: 1.25rem;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.entry-day {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1.25rem;
+}
+
+.entry-day-date {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.75rem;
+}
+
+.entry-item {
+  margin-bottom: 0.75rem;
+}
+
+.entry-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.entry-headline { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+
+.entry-reflection {
+  font-size: 12px;
+  color: var(--ink-muted);
+  font-style: italic;
+  line-height: 1.5;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--rule);
+}
+
+.no-entries {
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: 13px;
+  font-style: italic;
+  padding: 2rem 0;
+}
+
+/* ── ERROR ── */
+.error-state {
+  text-align: center;
+  padding: 2.5rem 0;
+  color: var(--ink-muted);
+}
+
+.error-state p { font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.5; }
+
+.retry-btn {
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 8px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.retry-btn:hover { border-color: var(--ink-muted); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div class="setup-logo">The Brief<span>.</span></div>
+    <div class="setup-tagline">Your daily edge — firm · market · political</div>
+
+    <div class="setup-field">
+      <label class="setup-label" for="api-key-input">Your Google Gemini API Key</label>
+      <input class="setup-input" type="password" id="api-key-input" placeholder="AIza..." autocomplete="off">
+      <div class="setup-note">
+        Free at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent-firm)">aistudio.google.com/apikey</a> — no credit card, 1,500 requests/day free. Stored only in your browser.
+      </div>
+    </div>
+
+    <button class="setup-btn" onclick="startApp()">Start reading →</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <div class="masthead">
+    <div class="masthead-eyebrow">Your daily edge</div>
+    <div class="masthead-title">The Brief<span>.</span></div>
+    <div class="masthead-date" id="today-date"></div>
+    <div class="streak-pill">
+      <span>🔥</span>
+      <span class="streak-count" id="streak-num">0</span>
+      <span style="color:var(--ink-faint); font-size:11px; font-weight:400;">day streak</span>
+    </div>
+  </div>
+
+  <div class="completion-bar">
+    <div class="completion-dot" id="dot-firm"></div>
+    <div class="completion-dot" id="dot-market"></div>
+    <div class="completion-dot" id="dot-political"></div>
+    <span class="completion-text" id="completion-text">0 of 3 briefings completed today</span>
+  </div>
+
+  <div class="nav-tabs">
+    <div class="nav-tab active" data-section="firm" onclick="switchTab('firm')">
+      Firm &amp; Deal <span class="tab-done-indicator" id="tab-dot-firm"></span>
+    </div>
+    <div class="nav-tab" data-section="market" onclick="switchTab('market')">
+      Market <span class="tab-done-indicator" id="tab-dot-market"></span>
+    </div>
+    <div class="nav-tab" data-section="political" onclick="switchTab('political')">
+      Political <span class="tab-done-indicator" id="tab-dot-political"></span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="article-section active" id="section-firm">
+      <div id="firm-gen-wrap">
+        <button class="generate-btn" onclick="generateArticle('firm')">
+          ↓ Load today's firm &amp; deal briefing
+        </button>
+      </div>
+      <div id="firm-loading" class="loading-state" style="display:none">
+        <div class="loading-label">Sourcing today's deal intelligence...</div>
+        <div class="loading-steps">
+          <div class="loading-step active" id="firm-step-1">
+            <div class="step-icon">●</div><span>Searching live news</span>
+          </div>
+          <div class="loading-step" id="firm-step-2">
+            <div class="step-icon"></div><span>Analysing the story</span>
+          </div>
+          <div class="loading-step" id="firm-step-3">
+            <div class="step-icon"></div><span>Writing your briefing</span>
+          </div>
+        </div>
+      </div>
+      <div id="firm-article"></div>
+    </div>
+
+    <div class="article-section" id="section-market">
+      <div id="market-gen-wrap">
+        <button class="generate-btn" onclick="generateArticle('market')">
+          ↓ Load today's market briefing
+        </button>
+      </div>
+      <div id="market-loading" class="loading-state" style="display:none">
+        <div class="loading-label">Reading the tape...</div>
+        <div class="loading-steps">
+          <div class="loading-step active" id="market-step-1">
+            <div class="step-icon">●</div><span>Searching live news</span>
+          </div>
+          <div class="loading-step" id="market-step-2">
+            <div class="step-icon"></div><span>Analysing the story</span>
+          </div>
+          <div class="loading-step" id="market-step-3">
+            <div class="step-icon"></div><span>Writing your briefing</span>
+          </div>
+        </div>
+      </div>
+      <div id="market-article"></div>
+    </div>
+
+    <div class="article-section" id="section-political">
+      <div id="political-gen-wrap">
+        <button class="generate-btn" onclick="generateArticle('political')">
+          ↓ Load today's political briefing
+        </button>
+      </div>
+      <div id="political-loading" class="loading-state" style="display:none">
+        <div class="loading-label">Monitoring the wire...</div>
+        <div class="loading-steps">
+          <div class="loading-step active" id="political-step-1">
+            <div class="step-icon">●</div><span>Searching live news</span>
+          </div>
+          <div class="loading-step" id="political-step-2">
+            <div class="step-icon"></div><span>Analysing the story</span>
+          </div>
+          <div class="loading-step" id="political-step-3">
+            <div class="step-icon"></div><span>Writing your briefing</span>
+          </div>
+        </div>
+      </div>
+      <div id="political-article"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Past entries -->
+<button class="history-panel-btn" id="history-btn" onclick="toggleHistory()" style="display:none">Journal ↗</button>
+
+<div class="history-panel" id="history-panel">
+  <button class="history-panel-close" onclick="toggleHistory()">×</button>
+  <div class="history-panel-title">Your journal</div>
+  <div class="history-panel-sub">Every reflection you've written, saved.</div>
+  <div id="history-entries"></div>
+</div>
+
+<!-- Celebration -->
+<div class="overlay" id="cel-overlay">
+  <div class="cel-card">
+    <div class="cel-emoji" id="cel-emoji">✓</div>
+    <div class="cel-headline" id="cel-headline">Filed.</div>
+    <div class="cel-sub" id="cel-sub">Keep going.</div>
+    <div class="cel-streak" id="cel-streak"></div>
+    <button class="cel-close" onclick="closeCel()">Continue</button>
+  </div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────
+const STORE_KEY = 'thebrief_v2';
+
+function loadStore() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; }
+}
+function saveStore() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch {}
+}
+
+let store = loadStore();
+let apiKey = localStorage.getItem('thebrief_apikey') || '';
+const todayKey = new Date().toISOString().split('T')[0];
+
+if (!store[todayKey]) store[todayKey] = { completed: {}, reflections: {}, headlines: {} };
+
+// ── SETUP ──────────────────────────────────────────────────────────────
+function startApp() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('AIza') || key.length < 20) {
+    alert('That doesn\'t look like a valid Gemini API key (should start with AIza...).\n\nGet one free at aistudio.google.com/apikey');
+    return;
+  }
+  apiKey = key;
+  localStorage.setItem('thebrief_apikey', key);
+  launchApp();
+}
+
+function launchApp() {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('history-btn').style.display = 'block';
+
+  const d = new Date();
+  document.getElementById('today-date').textContent =
+    d.toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' }).toUpperCase();
+
+  updateUI();
+}
+
+// Auto-launch if key already saved
+if (apiKey) launchApp();
+
+// ── UI ──────────────────────────────────────────────────────────────────
+function switchTab(s) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-section="${s}"]`).classList.add('active');
+  document.querySelectorAll('.article-section').forEach(el => el.classList.remove('active'));
+  document.getElementById(`section-${s}`).classList.add('active');
+}
+
+function updateUI() {
+  const day = store[todayKey];
+  const count = Object.keys(day.completed).length;
+  document.getElementById('completion-text').textContent = `${count} of 3 briefings completed today`;
+  document.getElementById('streak-num').textContent = calcStreak();
+
+  ['firm','market','political'].forEach(s => {
+    const dot = document.getElementById(`dot-${s}`);
+    dot.className = 'completion-dot' + (day.completed[s] ? ` dot-done-${s}` : '');
+    const td = document.getElementById(`tab-dot-${s}`);
+    if (td) {
+      td.style.background = day.completed[s]
+        ? (s === 'firm' ? 'var(--accent-firm)' : s === 'market' ? 'var(--accent-market)' : 'var(--accent-political)')
+        : 'transparent';
+      td.style.width = '6px'; td.style.height = '6px'; td.style.borderRadius = '50%'; td.style.display = 'inline-block';
+    }
+  });
+}
+
+function calcStreak() {
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 365; i++) {
+    const k = d.toISOString().split('T')[0];
+    if (store[k] && Object.keys(store[k].completed).length === 3) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else break;
+  }
+  return streak;
+}
+
+// ── GENERATE ──────────────────────────────────────────────────────────
+const JSON_SCHEMA = `Return ONLY valid JSON — no markdown fences, no preamble, no trailing text. Exactly this structure:
+{
+  "kicker": "2-3 word category label",
+  "headline": "Sharp specific headline in sentence case",
+  "deck": "One sentence that frames why this matters right now",
+  "history": [
+    {"year": "YYYY or Month YYYY", "text": "Specific description — real names, real events"}
+  ],
+  "psychology": "2-3 sentences on the human decision-making, incentives, ego, fear, greed, or cognitive bias at play. Be analytically sharp, not generic.",
+  "body": "3 paragraphs separated by double newline \\n\\n covering: (1) what happened and the mechanics, (2) the strategic logic and what they were really betting on, (3) the broader context and what it signals",
+  "facts": [
+    {"label": "Short metric name", "value": "Specific number or stat"}
+  ],
+  "st_impact": "1-2 sentences on immediate consequences — moves, reactions, near-term fallout",
+  "lt_impact": "1-2 sentences on 5-10 year implications — structure, precedent, power shifts",
+  "pros": ["Specific argument 1", "Specific argument 2", "Specific argument 3"],
+  "cons": ["Specific counter-argument 1", "2", "3"],
+  "questions": [
+    "Question challenging incentives or second-order effects",
+    "Question connecting to a historical parallel",
+    "Question about what you'd do as the decision-maker"
+  ],
+  "reflection_prompt": "A direct specific question to the reader connecting this to their own thinking. Not generic."
+}
+Rules: history 3-5 items, facts exactly 4, pros/cons 3 each, questions 3. Be specific — real names, real numbers.`;
+
+const PROMPTS = {
+  firm: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today's date is ${new Date().toDateString()}.
+
+Search for ONE major real recent story (past 7 days preferred) about a specific company deal, M&A transaction, LBO, IPO, bankruptcy, hostile takeover, or activist campaign. Use Google Search to find what's actually happening right now.
+
+Pick the most interesting, consequential story you find. Write a deep intelligent briefing.
+
+${JSON_SCHEMA}
+
+The kicker should reflect the deal type e.g. "Hostile Takeover", "LBO", "M&A", "Activist Campaign", "IPO", "Bankruptcy".
+The psychology section should cover: what drove this decision, what biases or pressures shaped it, what the key actors were really afraid of or wanted.
+The body paragraphs should cover the deal mechanics, the strategic logic, and the industry signal.
+The reflection_prompt should connect to finance careers, deal-making, or values.`,
+
+  market: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today's date is ${new Date().toDateString()}.
+
+Search for ONE significant current market story — macro move, central bank decision, sector rotation, commodity shock, credit event, or structural market change. Use Google Search to find what's actually moving markets right now.
+
+Pick the most analytically interesting story. Write a deep intelligent briefing.
+
+${JSON_SCHEMA}
+
+The kicker should reflect the category e.g. "Rate Decision", "Credit Markets", "FX Move", "Commodity Shock", "Equity Selloff".
+The psychology section should cover: market sentiment, positioning, herd behaviour, narrative shifts, fear vs greed dynamics.
+The body should cover: the mechanics of what's happening, macro forces and who's positioned how, where we are in the cycle.
+The pros/cons should be bull case vs bear case — specific and argued.
+The reflection_prompt should connect to risk, uncertainty, and the reader's future in finance.`,
+
+  political: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today's date is ${new Date().toDateString()}.
+
+Search for ONE significant current political or geopolitical story with real economic and market consequences — trade policy, sanctions, elections with market implications, regulatory shifts, or geopolitical conflict with financial dimensions. Use Google Search to find what's actually happening.
+
+Pick the most consequential story with clear financial implications. Write a deep intelligent briefing.
+
+${JSON_SCHEMA}
+
+The kicker should reflect the category e.g. "Trade War", "Sanctions", "Election Risk", "Regulatory Shift", "Geopolitical Risk".
+The psychology section should treat key actors like game theory players — their incentives, domestic pressures, what they fear, what they want.
+The body should cover: the political context, the economic/market transmission mechanism, the geopolitical chessboard.
+The pros/cons should be case for vs case against this outcome/decision — specific and argued.
+The reflection_prompt should connect to power, global capital, and what role the reader wants to play.`
+};
+
+const ACCENT = {
+  firm: 'var(--accent-firm)',
+  market: 'var(--accent-market)',
+  political: 'var(--accent-political)'
+};
+
+async function generateArticle(section) {
+  const genWrap = document.getElementById(`${section}-gen-wrap`);
+  const loading = document.getElementById(`${section}-loading`);
+  const articleEl = document.getElementById(`${section}-article`);
+
+  genWrap.style.display = 'none';
+  loading.style.display = 'block';
+
+  // Animate loading steps
+  const stepTiming = [0, 2500, 5500];
+  stepTiming.forEach((delay, i) => {
+    setTimeout(() => {
+      const steps = loading.querySelectorAll('.loading-step');
+      steps.forEach((s, j) => {
+        if (j < i) { s.classList.remove('active'); s.classList.add('done'); s.querySelector('.step-icon').textContent = '✓'; }
+        else if (j === i) { s.classList.add('active'); }
+      });
+    }, delay);
+  });
+
+  try {
+    // Gemini 2.0 Flash with Google Search grounding
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: PROMPTS[section] }] }],
+          tools: [{ google_search: {} }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 4096,
+            responseMimeType: 'text/plain'
+          }
+        })
+      }
+    );
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      const msg = err.error?.message || `HTTP ${resp.status}`;
+      throw new Error(msg);
+    }
+
+    const data = await resp.json();
+
+    // Extract text from Gemini response
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const raw = parts.filter(p => p.text).map(p => p.text).join('');
+
+    // Strip markdown fences and extract JSON
+    const clean = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    let parsed;
+    try {
+      parsed = JSON.parse(clean);
+    } catch {
+      const match = clean.match(/\{[\s\S]*\}/);
+      if (match) {
+        parsed = JSON.parse(match[0]);
+      } else {
+        throw new Error('Response wasn\'t valid JSON. Try again.');
+      }
+    }
+
+    const savedReflection = store[todayKey].reflections[section] || '';
+    const alreadyDone = !!store[todayKey].completed[section];
+
+    store[todayKey].headlines[section] = parsed.headline;
+    saveStore();
+
+    articleEl.innerHTML = buildArticleHTML(section, parsed, savedReflection, alreadyDone);
+    loading.style.display = 'none';
+    if (savedReflection) updateWC(section);
+
+  } catch (err) {
+    loading.style.display = 'none';
+    articleEl.innerHTML = `
+      <div class="error-state">
+        <p>Couldn't load this briefing.<br><small style="color:var(--ink-faint)">${err.message}</small></p>
+        <button class="retry-btn" onclick="retryArticle('${section}')">Try again</button>
+      </div>`;
+  }
+}
+
+function retryArticle(section) {
+  document.getElementById(`${section}-article`).innerHTML = '';
+  document.getElementById(`${section}-gen-wrap`).style.display = 'block';
+  generateArticle(section);
+}
+
+function buildArticleHTML(section, d, savedReflection, alreadyDone) {
+  const historyHTML = (d.history || []).map(h => `
+    <div class="history-item">
+      <div class="history-year">${h.year}</div>
+      <div class="history-text">${h.text}</div>
+    </div>`).join('');
+
+  const factsHTML = (d.facts || []).map(f => `
+    <div class="fact-card">
+      <div class="fact-label">${f.label}</div>
+      <div class="fact-value" style="color:${ACCENT[section]}">${f.value}</div>
+    </div>`).join('');
+
+  const bodyParas = (d.body || '').split(/\n\n+/).filter(Boolean).map(p => `<p>${p.trim()}</p>`).join('');
+
+  const prosHTML = (d.pros || []).map(p => `<li>${p}</li>`).join('');
+  const consHTML = (d.cons || []).map(c => `<li>${c}</li>`).join('');
+  const questionsHTML = (d.questions || []).map(q => `<div class="question-item">${q}</div>`).join('');
+
+  const PROS_LABEL = { firm: 'Bull case', market: 'Bull case', political: 'For' };
+  const CONS_LABEL = { firm: 'Bear case', market: 'Bear case', political: 'Against' };
+
+  return `
+    <div class="article-kicker kicker-${section}">${d.kicker || section}</div>
+    <h1 class="article-headline">${d.headline}</h1>
+    <div class="article-deck">${d.deck}</div>
+    <hr class="article-rule">
+
+    <div class="section-heading">Context &amp; history</div>
+    <div class="history-timeline">${historyHTML}</div>
+
+    ${d.psychology ? `
+    <div class="psych-callout">
+      <div class="psych-callout-label">Decision-making &amp; psychology</div>
+      ${d.psychology}
+    </div>` : ''}
+
+    <div class="section-heading">The story</div>
+    <div class="article-body">${bodyParas}</div>
+    <hr class="article-rule">
+
+    <div class="section-heading">Key numbers</div>
+    <div class="facts-grid">${factsHTML}</div>
+
+    <div class="section-heading">Impact</div>
+    <div class="impact-block">
+      <span class="impact-badge badge-st">Short-term</span>
+      <span class="impact-text">${d.st_impact || ''}</span>
+    </div>
+    <div class="impact-block">
+      <span class="impact-badge badge-lt">Long-term</span>
+      <span class="impact-text">${d.lt_impact || ''}</span>
+    </div>
+
+    <div class="section-heading">The debate</div>
+    <div class="pros-cons">
+      <div class="pros">
+        <div class="pros-cons-label">${PROS_LABEL[section]}</div>
+        <ul>${prosHTML}</ul>
+      </div>
+      <div class="cons">
+        <div class="pros-cons-label">${CONS_LABEL[section]}</div>
+        <ul>${consHTML}</ul>
+      </div>
+    </div>
+
+    <div class="section-heading">Questions to sit with</div>
+    <div class="questions-box">
+      <div class="questions-label">Think harder</div>
+      ${questionsHTML}
+    </div>
+
+    <div class="reflection-zone">
+      <div class="reflection-header">
+        <div class="reflection-title">Your take</div>
+        <span class="word-count" id="wc-${section}">0 words</span>
+      </div>
+      <div class="reflection-prompt">${d.reflection_prompt || 'What does this make you think about?'}</div>
+      <textarea
+        class="reflection-textarea"
+        id="reflect-${section}"
+        placeholder="Write anything. No judgment, no grade. Even one sentence is enough."
+        oninput="updateWC('${section}')"
+      >${savedReflection}</textarea>
+      <button
+        class="save-btn ${alreadyDone ? 'saved' : ''}"
+        id="save-${section}"
+        onclick="saveReflection('${section}')"
+        ${alreadyDone ? 'disabled' : ''}
+      >${alreadyDone ? '✓ Saved' : 'Save & mark complete'}</button>
+    </div>
+  `;
+}
+
+// ── REFLECTION ────────────────────────────────────────────────────────
+function updateWC(section) {
+  const ta = document.getElementById(`reflect-${section}`);
+  if (!ta) return;
+  const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+  const el = document.getElementById(`wc-${section}`);
+  if (el) el.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+}
+
+function saveReflection(section) {
+  const ta = document.getElementById(`reflect-${section}`);
+  store[todayKey].reflections[section] = ta.value;
+  store[todayKey].completed[section] = new Date().toISOString();
+  saveStore();
+
+  const btn = document.getElementById(`save-${section}`);
+  btn.disabled = true;
+  btn.textContent = '✓ Saved';
+  btn.classList.add('saved');
+
+  updateUI();
+
+  const count = Object.keys(store[todayKey].completed).length;
+  showCel(count);
+}
+
+// ── CELEBRATION ───────────────────────────────────────────────────────
+const SECTION_MSGS = {
+  firm: { e: '📋', h: 'Deal logged.', s: 'Two more sections to complete today\'s brief.' },
+  market: { e: '📈', h: 'Tape read.', s: 'Two more sections to complete today\'s brief.' },
+  political: { e: '🗞', h: 'On the record.', s: 'Two more sections to complete today\'s brief.' }
+};
+
+function showCel(count) {
+  const section = ['firm','market','political'].find(s => !document.getElementById(`save-${s}`)?.disabled) || 'firm';
+  const overlay = document.getElementById('cel-overlay');
+  const streak = calcStreak();
+
+  if (count === 3) {
+    document.getElementById('cel-emoji').textContent = '🏆';
+    document.getElementById('cel-headline').textContent = 'Today\'s brief: done.';
+    document.getElementById('cel-sub').textContent = 'All three sections — read, thought about, written on. That\'s the compounding that matters.';
+    document.getElementById('cel-streak').textContent = streak > 1 ? `🔥 ${streak}-day streak` : '🔥 Day one. The streak starts now.';
+  } else {
+    const currentSection = ['firm','market','political'].find(s => store[todayKey].completed[s] && !document.getElementById(`save-${s}`)?.textContent.includes('✓'));
+    const msg = SECTION_MSGS[section] || { e: '✓', h: 'Filed.', s: 'Keep going.' };
+    document.getElementById('cel-emoji').textContent = msg.e;
+    document.getElementById('cel-headline').textContent = msg.h;
+    document.getElementById('cel-sub').textContent = count === 1 ? 'One down, two to go.' : 'Two down, one to go.';
+    document.getElementById('cel-streak').textContent = '';
+  }
+
+  overlay.classList.add('show');
+}
+
+function closeCel() {
+  document.getElementById('cel-overlay').classList.remove('show');
+}
+
+// ── HISTORY PANEL ─────────────────────────────────────────────────────
+let historyOpen = false;
+
+function toggleHistory() {
+  historyOpen = !historyOpen;
+  const panel = document.getElementById('history-panel');
+  panel.classList.toggle('open', historyOpen);
+  if (historyOpen) renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-entries');
+  const days = Object.keys(store).sort().reverse();
+
+  if (days.length === 0) {
+    el.innerHTML = '<div class="no-entries">No entries yet. Complete your first briefing.</div>';
+    return;
+  }
+
+  el.innerHTML = days.map(day => {
+    const data = store[day];
+    if (!data || !data.reflections) return '';
+
+    const sections = ['firm','market','political'].filter(s => data.reflections[s]);
+    if (sections.length === 0) return '';
+
+    const dateStr = new Date(day + 'T12:00:00').toLocaleDateString('en-GB', { weekday:'short', month:'short', day:'numeric' }).toUpperCase();
+
+    const sectionHTML = sections.map(s => {
+      const LABELS = { firm: 'Firm & Deal', market: 'Market', political: 'Political' };
+      const COLORS = { firm: 'var(--accent-firm)', market: 'var(--accent-market)', political: 'var(--accent-political)' };
+      const headline = data.headlines?.[s] || '';
+      const reflection = data.reflections[s] || '';
+
+      return `
+        <div class="entry-item">
+          <div class="entry-section-label" style="color:${COLORS[s]}">${LABELS[s]}</div>
+          ${headline ? `<div class="entry-headline">${headline}</div>` : ''}
+          ${reflection ? `<div class="entry-reflection">${reflection.substring(0, 200)}${reflection.length > 200 ? '…' : ''}</div>` : ''}
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="entry-day">
+        <div class="entry-day-date">${dateStr}</div>
+        ${sectionHTML}
+      </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
