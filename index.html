@@ -902,7 +902,7 @@ body {
         <div class="loading-label">Sourcing today's deal intelligence...</div>
         <div class="loading-steps">
           <div class="loading-step active" id="firm-step-1">
-            <div class="step-icon">●</div><span>Searching live news</span>
+            <div class="step-icon">●</div><span>Pulling recent events</span>
           </div>
           <div class="loading-step" id="firm-step-2">
             <div class="step-icon"></div><span>Analysing the story</span>
@@ -925,7 +925,7 @@ body {
         <div class="loading-label">Reading the tape...</div>
         <div class="loading-steps">
           <div class="loading-step active" id="market-step-1">
-            <div class="step-icon">●</div><span>Searching live news</span>
+            <div class="step-icon">●</div><span>Pulling recent events</span>
           </div>
           <div class="loading-step" id="market-step-2">
             <div class="step-icon"></div><span>Analysing the story</span>
@@ -948,7 +948,7 @@ body {
         <div class="loading-label">Monitoring the wire...</div>
         <div class="loading-steps">
           <div class="loading-step active" id="political-step-1">
-            <div class="step-icon">●</div><span>Searching live news</span>
+            <div class="step-icon">●</div><span>Pulling recent events</span>
           </div>
           <div class="loading-step" id="political-step-2">
             <div class="step-icon"></div><span>Analysing the story</span>
@@ -1169,13 +1169,12 @@ async function generateArticle(section) {
   try {
     // Gemini 2.0 Flash with Google Search grounding
     const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: PROMPTS[section] }] }],
-          tools: [{ google_search: {} }],
           generationConfig: {
             temperature: 0.7,
             maxOutputTokens: 4096,
