@@ -846,10 +846,18 @@ body {
     <div class="setup-tagline">Your daily edge — firm · market · political</div>
 
     <div class="setup-field">
-      <label class="setup-label" for="api-key-input">Your Google Gemini API Key</label>
+      <label class="setup-label" for="api-key-input">Gemini API Key</label>
       <input class="setup-input" type="password" id="api-key-input" placeholder="AIza..." autocomplete="off">
       <div class="setup-note">
-        Free at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent-firm)">aistudio.google.com/apikey</a> — no credit card, 1,500 requests/day free. Stored only in your browser.
+        Free at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent-firm)">aistudio.google.com/apikey</a> — no credit card needed.
+      </div>
+    </div>
+
+    <div class="setup-field">
+      <label class="setup-label" for="news-key-input">NewsAPI Key</label>
+      <input class="setup-input" type="password" id="news-key-input" placeholder="a1b2c3..." autocomplete="off">
+      <div class="setup-note">
+        Free at <a href="https://newsapi.org/register" target="_blank" style="color:var(--accent-firm)">newsapi.org/register</a> — pulls today's real headlines before Gemini writes your briefing.
       </div>
     </div>
 
@@ -999,6 +1007,7 @@ function saveStore() {
 
 let store = loadStore();
 let apiKey = localStorage.getItem('thebrief_apikey') || '';
+let newsApiKey = localStorage.getItem('thebrief_newskey') || '';
 const todayKey = new Date().toISOString().split('T')[0];
 
 if (!store[todayKey]) store[todayKey] = { completed: {}, reflections: {}, headlines: {} };
@@ -1006,10 +1015,21 @@ if (!store[todayKey]) store[todayKey] = { completed: {}, reflections: {}, headli
 // ── SETUP ──────────────────────────────────────────────────────────────
 function startApp() {
   const key = document.getElementById('api-key-input').value.trim();
+  const nkey = document.getElementById('news-key-input').value.trim();
   if (!key.startsWith('AIza') || key.length < 20) {
-    alert('That doesn\'t look like a valid Gemini API key (should start with AIza...).\n\nGet one free at aistudio.google.com/apikey');
+    alert('Invalid Gemini key — should start with AIza. Get one at aistudio.google.com/apikey');
     return;
   }
+  if (nkey.length < 10) {
+    alert('Invalid NewsAPI key. Get one free at newsapi.org/register');
+    return;
+  }
+  apiKey = key;
+  newsApiKey = nkey;
+  localStorage.setItem('thebrief_apikey', key);
+  localStorage.setItem('thebrief_newskey', nkey);
+  launchApp();
+}
   apiKey = key;
   localStorage.setItem('thebrief_apikey', key);
   launchApp();
@@ -1027,8 +1047,8 @@ function launchApp() {
   updateUI();
 }
 
-// Auto-launch if key already saved
-if (apiKey) launchApp();
+// Auto-launch if keys already saved
+if (apiKey && newsApiKey) launchApp();
 
 // ── UI ──────────────────────────────────────────────────────────────────
 function switchTab(s) {
@@ -1167,14 +1187,34 @@ async function generateArticle(section) {
   });
 
   try {
-    // Gemini 2.0 Flash with Google Search grounding
+    // Step 1: Fetch today's headlines from NewsAPI
+    const NEWS_QUERIES = {
+      firm: 'M&A acquisition merger deal IPO bankruptcy',
+      market: 'markets stocks bonds Fed interest rates inflation',
+      political: 'geopolitics trade policy sanctions government economy'
+    };
+    const newsResp = await fetch(
+      `https://newsapi.org/v2/everything?q=${encodeURIComponent(NEWS_QUERIES[section])}&language=en&sortBy=publishedAt&pageSize=5&apiKey=${newsApiKey}`
+    );
+    let headlineContext = '';
+    if (newsResp.ok) {
+      const newsData = await newsResp.json();
+      const articles = (newsData.articles || []).slice(0, 5);
+      if (articles.length > 0) {
+        headlineContext = '\n\nHere are today\'s real headlines to base your briefing on — pick the most interesting one:\n' +
+          articles.map((a, i) => `${i+1}. "${a.title}" — ${a.source?.name || ''} (${a.publishedAt?.slice(0,10) || 'today'})\n   ${a.description || ''}`).join('\n');
+      }
+    }
+
+    // Step 2: Send to Gemini with real headlines injected
+    const prompt = PROMPTS[section] + headlineContext;
     const resp = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: PROMPTS[section] }] }],
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.7,
             maxOutputTokens: 4096,
@@ -1441,3 +1481,4 @@ function renderHistory() {
 </script>
 </body>
 </html>
+
