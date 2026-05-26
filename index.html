@@ -1098,11 +1098,11 @@ const JSON_SCHEMA = `Return ONLY valid JSON — no markdown fences, no preamble,
 Rules: history 3-5 items, facts exactly 4, pros/cons 3 each, questions 3. Be specific — real names, real numbers.`;
 
 const PROMPTS = {
-  firm: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today's date is ${new Date().toDateString()}.
+  firm: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today is ${new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.
 
-Search for ONE major real recent story (past 7 days preferred) about a specific company deal, M&A transaction, LBO, IPO, bankruptcy, hostile takeover, or activist campaign. Use Google Search to find what's actually happening right now.
+IMPORTANT: Search the web right now for M&A deals, acquisitions, IPOs, or corporate news from the last 48 hours. Prioritise stories from the last 24 hours first. If nothing significant, expand to 48 hours. Do multiple searches to find the most current and interesting story available.
 
-Pick the most interesting, consequential story you find. Write a deep intelligent briefing.
+Pick the most interesting story from the last 48 hours. If you genuinely cannot find anything from 48 hours, use the last 7 days. Write a deep intelligent briefing.
 
 ${JSON_SCHEMA}
 
@@ -1111,11 +1111,11 @@ The psychology section should cover: what drove this decision, what biases or pr
 The body paragraphs should cover the deal mechanics, the strategic logic, and the industry signal.
 The reflection_prompt should connect to finance careers, deal-making, or values.`,
 
-  market: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today's date is ${new Date().toDateString()}.
+  market: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today is ${new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.
 
-Search for ONE significant current market story — macro move, central bank decision, sector rotation, commodity shock, credit event, or structural market change. Use Google Search to find what's actually moving markets right now.
+IMPORTANT: Search the web right now for market-moving news from the last 48 hours. Prioritise stories from the last 24 hours first. If nothing significant, expand to 48 hours. Do multiple searches to find the most current and interesting story available.
 
-Pick the most analytically interesting story. Write a deep intelligent briefing.
+Pick the most analytically interesting story from the last 48 hours. If nothing major in 48 hours, use last 7 days. Write a deep intelligent briefing.
 
 ${JSON_SCHEMA}
 
@@ -1125,11 +1125,11 @@ The body should cover: the mechanics of what's happening, macro forces and who's
 The pros/cons should be bull case vs bear case — specific and argued.
 The reflection_prompt should connect to risk, uncertainty, and the reader's future in finance.`,
 
-  political: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today's date is ${new Date().toDateString()}.
+  political: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today is ${new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.
 
-Search for ONE significant current political or geopolitical story with real economic and market consequences — trade policy, sanctions, elections with market implications, regulatory shifts, or geopolitical conflict with financial dimensions. Use Google Search to find what's actually happening.
+IMPORTANT: Search the web right now for geopolitical or political economy news from the last 48 hours. Prioritise stories from the last 24 hours first. If nothing significant, expand to 48 hours. Do multiple searches to find the most current and interesting story available.
 
-Pick the most consequential story with clear financial implications. Write a deep intelligent briefing.
+Pick the most consequential story from the last 48 hours with clear financial implications. If nothing major in 48 hours, use last 7 days. Write a deep intelligent briefing.
 
 ${JSON_SCHEMA}
 
