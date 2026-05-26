@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1100,9 +1101,13 @@ Rules: history 3-5 items, facts exactly 4, pros/cons 3 each, questions 3. Be spe
 const PROMPTS = {
   firm: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today is ${new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.
 
-IMPORTANT: Search the web right now for M&A deals, acquisitions, IPOs, or corporate news from the last 48 hours. Prioritise stories from the last 24 hours first. If nothing significant, expand to 48 hours. Do multiple searches to find the most current and interesting story available.
+Your job: find and write about a real corporate story — M&A, deal, IPO, bankruptcy, activist campaign — published in the last 24 hours. If nothing in 24 hours, use 48 hours max. Do NOT use anything older than 48 hours.
 
-Pick the most interesting story from the last 48 hours. If you genuinely cannot find anything from 48 hours, use the last 7 days. Write a deep intelligent briefing.
+Search step by step:
+1. Search "M&A deal announced today ${new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'})}"
+2. Search "acquisition news ${new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'})}"
+3. Search "corporate deal breaking news today"
+Pick the most interesting result published within the last 48 hours. If every result is older than 48 hours, say so and stop — do not write a briefing about an old story.
 
 ${JSON_SCHEMA}
 
@@ -1113,9 +1118,13 @@ The reflection_prompt should connect to finance careers, deal-making, or values.
 
   market: `You are writing for The Brief, an elite daily finance & geopolitics digest for sharp, ambitious finance students. Today is ${new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.
 
-IMPORTANT: Search the web right now for market-moving news from the last 48 hours. Prioritise stories from the last 24 hours first. If nothing significant, expand to 48 hours. Do multiple searches to find the most current and interesting story available.
+Your job: find and write about a real market story — macro move, central bank decision, sector move, commodity shock, credit event — published in the last 24 hours. If nothing in 24 hours, use 48 hours max. Do NOT use anything older than 48 hours.
 
-Pick the most analytically interesting story from the last 48 hours. If nothing major in 48 hours, use last 7 days. Write a deep intelligent briefing.
+Search step by step:
+1. Search "markets news today ${new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'})}"
+2. Search "stocks bonds market moving today ${new Date().toLocaleDateString('en-GB', {month:'long', year:'numeric'})}"
+3. Search "financial markets breaking news today"
+Pick the most interesting result published within the last 48 hours. If every result is older than 48 hours, say so and stop — do not write a briefing about an old story.
 
 ${JSON_SCHEMA}
 
