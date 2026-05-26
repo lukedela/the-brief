@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -845,19 +846,11 @@ body {
     <div class="setup-logo">The Brief<span>.</span></div>
     <div class="setup-tagline">Your daily edge — firm · market · political</div>
 
-    <div class="setup-field">
-      <label class="setup-label" for="api-key-input">Gemini API Key</label>
-      <input class="setup-input" type="password" id="api-key-input" placeholder="AIza..." autocomplete="off">
+        <div class="setup-field">
+      <label class="setup-label" for="api-key-input">Anthropic API Key</label>
+      <input class="setup-input" type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off">
       <div class="setup-note">
-        Free at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent-firm)">aistudio.google.com/apikey</a> — no credit card needed.
-      </div>
-    </div>
-
-    <div class="setup-field">
-      <label class="setup-label" for="news-key-input">GNews API Key</label>
-      <input class="setup-input" type="password" id="news-key-input" placeholder="e.g. a1b2c3d4e5f6..." autocomplete="off">
-      <div class="setup-note">
-        Free at <a href="https://gnews.io/register" target="_blank" style="color:var(--accent-firm)">gnews.io/register</a> — 100 requests/day free, works in browser. Pulls today's real headlines.
+        Get one at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent-firm)">console.anthropic.com</a> — $5 credit, no subscription. Stored only in your browser.
       </div>
     </div>
 
@@ -910,7 +903,7 @@ body {
         <div class="loading-label">Sourcing today's deal intelligence...</div>
         <div class="loading-steps">
           <div class="loading-step active" id="firm-step-1">
-            <div class="step-icon">●</div><span>Pulling recent events</span>
+            <div class="step-icon">●</div><span>Searching live news</span>
           </div>
           <div class="loading-step" id="firm-step-2">
             <div class="step-icon"></div><span>Analysing the story</span>
@@ -933,7 +926,7 @@ body {
         <div class="loading-label">Reading the tape...</div>
         <div class="loading-steps">
           <div class="loading-step active" id="market-step-1">
-            <div class="step-icon">●</div><span>Pulling recent events</span>
+            <div class="step-icon">●</div><span>Searching live news</span>
           </div>
           <div class="loading-step" id="market-step-2">
             <div class="step-icon"></div><span>Analysing the story</span>
@@ -956,7 +949,7 @@ body {
         <div class="loading-label">Monitoring the wire...</div>
         <div class="loading-steps">
           <div class="loading-step active" id="political-step-1">
-            <div class="step-icon">●</div><span>Pulling recent events</span>
+            <div class="step-icon">●</div><span>Searching live news</span>
           </div>
           <div class="loading-step" id="political-step-2">
             <div class="step-icon"></div><span>Analysing the story</span>
@@ -1007,27 +1000,19 @@ function saveStore() {
 
 let store = loadStore();
 let apiKey = localStorage.getItem('thebrief_apikey') || '';
-let newsApiKey = localStorage.getItem('thebrief_newskey') || '';
 const todayKey = new Date().toISOString().split('T')[0];
 
 if (!store[todayKey]) store[todayKey] = { completed: {}, reflections: {}, headlines: {} };
 
 // ── SETUP ──────────────────────────────────────────────────────────────
 function startApp() {
-  const key = document.getElementById('api-key-input').value.trim();
-  const nkey = document.getElementById('news-key-input').value.trim();
-  if (!key.startsWith('AIza') || key.length < 20) {
-    alert('Invalid Gemini key — should start with AIza. Get one at aistudio.google.com/apikey');
-    return;
-  }
-  if (nkey.length < 10) {
-    alert('Invalid GNews key. Get one free at gnews.io/register');
+  var key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('sk-ant-') && !key.startsWith('sk-')) {
+    alert('Invalid Anthropic key — should start with sk-ant-. Get one at console.anthropic.com');
     return;
   }
   apiKey = key;
-  newsApiKey = nkey;
   localStorage.setItem('thebrief_apikey', key);
-  localStorage.setItem('thebrief_newskey', nkey);
   launchApp();
 }
 
@@ -1044,7 +1029,7 @@ function launchApp() {
 }
 
 // Auto-launch if keys already saved
-if (apiKey && newsApiKey) launchApp();
+if (apiKey) launchApp();
 
 // ── UI ──────────────────────────────────────────────────────────────────
 function switchTab(s) {
@@ -1163,14 +1148,14 @@ const ACCENT = {
 };
 
 async function generateArticle(section) {
-  const genWrap = document.getElementById(section + '-gen-wrap');
-  const loading = document.getElementById(section + '-loading');
-  const articleEl = document.getElementById(section + '-article');
+  var genWrap = document.getElementById(section + '-gen-wrap');
+  var loading = document.getElementById(section + '-loading');
+  var articleEl = document.getElementById(section + '-article');
 
   genWrap.style.display = 'none';
   loading.style.display = 'block';
 
-  var stepTiming = [0, 2500, 5500];
+  var stepTiming = [0, 2000, 5000];
   stepTiming.forEach(function(delay, i) {
     setTimeout(function() {
       var steps = loading.querySelectorAll('.loading-step');
@@ -1181,78 +1166,47 @@ async function generateArticle(section) {
     }, delay);
   });
 
-  var NEWS_QUERIES = {
-    firm: 'acquisition merger deal IPO bankruptcy corporate',
-    market: 'markets stocks Fed rates inflation economy bonds',
-    political: 'geopolitics trade sanctions government policy election'
-  };
-
-  var headlineContext = '';
-
   try {
-    var newsUrl = 'https://gnews.io/api/v4/search?q=' + encodeURIComponent(NEWS_QUERIES[section]) + '&lang=en&max=5&sortby=publishedAt&token=' + newsApiKey;
-    var newsResp = await fetch(newsUrl);
-    if (newsResp.ok) {
-      var newsData = await newsResp.json();
-      var articles = (newsData.articles || []).slice(0, 5);
-      if (articles.length > 0) {
-        var articleLines = [];
-        for (var ai = 0; ai < articles.length; ai++) {
-          var a = articles[ai];
-          var src = (a.source && a.source.name) ? a.source.name : '';
-          var dt = a.publishedAt ? a.publishedAt.slice(0, 10) : 'today';
-          var desc = a.description ? a.description : '';
-          articleLines.push((ai + 1) + '. ' + a.title + ' [' + src + ', ' + dt + ']\n   ' + desc);
-        }
-        headlineContext = '\n\nHere are REAL news headlines from today. You MUST base your briefing on one of these real stories — do NOT invent company names or events:\n' + articleLines.join('\n') + '\n\nChoose the most interesting story above and write the full briefing about it using real names and real details.';
-      }
-    }
-  } catch(e) { /* gnews failed, Gemini uses own knowledge */ }
-
-  try {
-    var prompt = PROMPTS[section] + headlineContext;
-    var resp = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 4096,
-            responseMimeType: 'text/plain'
-          }
-        })
-      }
-    );
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
+        messages: [{ role: 'user', content: PROMPTS[section] }]
+      })
+    });
 
     if (!resp.ok) {
-      var err = await resp.json();
-      var msg = (err.error && err.error.message) ? err.error.message : ('HTTP ' + resp.status);
-      throw new Error(msg);
+      var errData = await resp.json();
+      throw new Error((errData.error && errData.error.message) ? errData.error.message : ('HTTP ' + resp.status));
     }
 
     var data = await resp.json();
-    var parts = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) ? data.candidates[0].content.parts : [];
-    var raw = parts.filter(function(p) { return p.text; }).map(function(p) { return p.text; }).join('');
+    var textBlocks = (data.content || []).filter(function(b) { return b.type === 'text'; });
+    var raw = textBlocks.map(function(b) { return b.text; }).join('');
     var clean = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
 
     var parsed;
     try {
       parsed = JSON.parse(clean);
-    } catch(e2) {
+    } catch(e) {
       var match = clean.match(/\{[\s\S]*\}/);
       if (match) {
         parsed = JSON.parse(match[0]);
       } else {
-        throw new Error('Response was not valid JSON. Try again.');
+        throw new Error('Could not parse response. Try again.');
       }
     }
 
     var savedReflection = store[todayKey].reflections[section] || '';
     var alreadyDone = !!store[todayKey].completed[section];
-
     store[todayKey].headlines[section] = parsed.headline;
     saveStore();
 
@@ -1260,9 +1214,14 @@ async function generateArticle(section) {
     loading.style.display = 'none';
     if (savedReflection) updateWC(section);
 
-  } catch (err) {
+  } catch(err) {
     loading.style.display = 'none';
-    articleEl.innerHTML = '<div class="error-state"><p>Could not load this briefing.<br><small>' + err.message + '</small></p><button class="retry-btn" onclick="retryArticle(\'' + section + '\')">Try again</button></div>';
+        articleEl.innerHTML = [
+      '<div class="error-state">',
+      '<p>Could not load briefing.<br><small>' + err.message + '</small></p>',
+      '<button class="retry-btn" onclick="retryArticle(\u0027' + section + '\u0027)">Try again</button>',
+      '</div>'
+    ].join('');
   }
 }
 
@@ -1477,4 +1436,3 @@ function renderHistory() {
 </script>
 </body>
 </html>
-
