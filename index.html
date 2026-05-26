@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -855,10 +854,10 @@ body {
     </div>
 
     <div class="setup-field">
-      <label class="setup-label" for="news-key-input">NewsAPI Key</label>
-      <input class="setup-input" type="password" id="news-key-input" placeholder="a1b2c3..." autocomplete="off">
+      <label class="setup-label" for="news-key-input">GNews API Key</label>
+      <input class="setup-input" type="password" id="news-key-input" placeholder="e.g. a1b2c3d4e5f6..." autocomplete="off">
       <div class="setup-note">
-        Free at <a href="https://newsapi.org/register" target="_blank" style="color:var(--accent-firm)">newsapi.org/register</a> — pulls today's real headlines before Gemini writes your briefing.
+        Free at <a href="https://gnews.io/register" target="_blank" style="color:var(--accent-firm)">gnews.io/register</a> — 100 requests/day free, works in browser. Pulls today's real headlines.
       </div>
     </div>
 
@@ -1022,7 +1021,7 @@ function startApp() {
     return;
   }
   if (nkey.length < 10) {
-    alert('Invalid NewsAPI key. Get one free at newsapi.org/register');
+    alert('Invalid GNews key. Get one free at gnews.io/register');
     return;
   }
   apiKey = key;
@@ -1164,49 +1163,56 @@ const ACCENT = {
 };
 
 async function generateArticle(section) {
-  const genWrap = document.getElementById(`${section}-gen-wrap`);
-  const loading = document.getElementById(`${section}-loading`);
-  const articleEl = document.getElementById(`${section}-article`);
+  const genWrap = document.getElementById(section + '-gen-wrap');
+  const loading = document.getElementById(section + '-loading');
+  const articleEl = document.getElementById(section + '-article');
 
   genWrap.style.display = 'none';
   loading.style.display = 'block';
 
-  // Animate loading steps
-  const stepTiming = [0, 2500, 5500];
-  stepTiming.forEach((delay, i) => {
-    setTimeout(() => {
-      const steps = loading.querySelectorAll('.loading-step');
-      steps.forEach((s, j) => {
+  var stepTiming = [0, 2500, 5500];
+  stepTiming.forEach(function(delay, i) {
+    setTimeout(function() {
+      var steps = loading.querySelectorAll('.loading-step');
+      steps.forEach(function(s, j) {
         if (j < i) { s.classList.remove('active'); s.classList.add('done'); s.querySelector('.step-icon').textContent = '✓'; }
         else if (j === i) { s.classList.add('active'); }
       });
     }, delay);
   });
 
+  var NEWS_QUERIES = {
+    firm: 'acquisition merger deal IPO bankruptcy corporate',
+    market: 'markets stocks Fed rates inflation economy bonds',
+    political: 'geopolitics trade sanctions government policy election'
+  };
+
+  var headlineContext = '';
+
   try {
-    // Step 1: Fetch today's headlines from NewsAPI
-    const NEWS_QUERIES = {
-      firm: 'M&A acquisition merger deal IPO bankruptcy',
-      market: 'markets stocks bonds Fed interest rates inflation',
-      political: 'geopolitics trade policy sanctions government economy'
-    };
-    const newsResp = await fetch(
-      `https://newsapi.org/v2/everything?q=${encodeURIComponent(NEWS_QUERIES[section])}&language=en&sortBy=publishedAt&pageSize=5&apiKey=${newsApiKey}`
-    );
-    let headlineContext = '';
+    var newsUrl = 'https://gnews.io/api/v4/search?q=' + encodeURIComponent(NEWS_QUERIES[section]) + '&lang=en&max=5&sortby=publishedAt&token=' + newsApiKey;
+    var newsResp = await fetch(newsUrl);
     if (newsResp.ok) {
-      const newsData = await newsResp.json();
-      const articles = (newsData.articles || []).slice(0, 5);
+      var newsData = await newsResp.json();
+      var articles = (newsData.articles || []).slice(0, 5);
       if (articles.length > 0) {
-        headlineContext = '\n\nHere are today\'s real headlines to base your briefing on — pick the most interesting one:\n' +
-          articles.map((a, i) => `${i+1}. "${a.title}" — ${a.source?.name || ''} (${a.publishedAt?.slice(0,10) || 'today'})\n   ${a.description || ''}`).join('\n');
+        var articleLines = [];
+        for (var ai = 0; ai < articles.length; ai++) {
+          var a = articles[ai];
+          var src = (a.source && a.source.name) ? a.source.name : '';
+          var dt = a.publishedAt ? a.publishedAt.slice(0, 10) : 'today';
+          var desc = a.description ? a.description : '';
+          articleLines.push((ai + 1) + '. ' + a.title + ' [' + src + ', ' + dt + ']\n   ' + desc);
+        }
+        headlineContext = '\n\nHere are REAL news headlines from today. You MUST base your briefing on one of these real stories — do NOT invent company names or events:\n' + articleLines.join('\n') + '\n\nChoose the most interesting story above and write the full briefing about it using real names and real details.';
       }
     }
+  } catch(e) { /* gnews failed, Gemini uses own knowledge */ }
 
-    // Step 2: Send to Gemini with real headlines injected
-    const prompt = PROMPTS[section] + headlineContext;
-    const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+  try {
+    var prompt = PROMPTS[section] + headlineContext;
+    var resp = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1222,33 +1228,30 @@ async function generateArticle(section) {
     );
 
     if (!resp.ok) {
-      const err = await resp.json();
-      const msg = err.error?.message || `HTTP ${resp.status}`;
+      var err = await resp.json();
+      var msg = (err.error && err.error.message) ? err.error.message : ('HTTP ' + resp.status);
       throw new Error(msg);
     }
 
-    const data = await resp.json();
+    var data = await resp.json();
+    var parts = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) ? data.candidates[0].content.parts : [];
+    var raw = parts.filter(function(p) { return p.text; }).map(function(p) { return p.text; }).join('');
+    var clean = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
 
-    // Extract text from Gemini response
-    const parts = data.candidates?.[0]?.content?.parts || [];
-    const raw = parts.filter(p => p.text).map(p => p.text).join('');
-
-    // Strip markdown fences and extract JSON
-    const clean = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-    let parsed;
+    var parsed;
     try {
       parsed = JSON.parse(clean);
-    } catch {
-      const match = clean.match(/\{[\s\S]*\}/);
+    } catch(e2) {
+      var match = clean.match(/\{[\s\S]*\}/);
       if (match) {
         parsed = JSON.parse(match[0]);
       } else {
-        throw new Error('Response wasn\'t valid JSON. Try again.');
+        throw new Error('Response was not valid JSON. Try again.');
       }
     }
 
-    const savedReflection = store[todayKey].reflections[section] || '';
-    const alreadyDone = !!store[todayKey].completed[section];
+    var savedReflection = store[todayKey].reflections[section] || '';
+    var alreadyDone = !!store[todayKey].completed[section];
 
     store[todayKey].headlines[section] = parsed.headline;
     saveStore();
@@ -1259,11 +1262,7 @@ async function generateArticle(section) {
 
   } catch (err) {
     loading.style.display = 'none';
-    articleEl.innerHTML = `
-      <div class="error-state">
-        <p>Couldn't load this briefing.<br><small style="color:var(--ink-faint)">${err.message}</small></p>
-        <button class="retry-btn" onclick="retryArticle('${section}')">Try again</button>
-      </div>`;
+    articleEl.innerHTML = '<div class="error-state"><p>Could not load this briefing.<br><small>' + err.message + '</small></p><button class="retry-btn" onclick="retryArticle(\'' + section + '\')">Try again</button></div>';
   }
 }
 
@@ -1478,3 +1477,4 @@ function renderHistory() {
 </script>
 </body>
 </html>
+
